@@ -303,6 +303,13 @@
     <h3>Definições</h3>
     <div class="settings-row">
       <div>
+        <div class="label">Instalar aplicação</div>
+        <div class="desc">Adiciona o Primal Force ao ecrã inicial</div>
+      </div>
+      <button class="settings-btn" id="installBtn" style="display:none;">Instalar</button>
+    </div>
+    <div class="settings-row">
+      <div>
         <div class="label">Progresso de episódios vistos</div>
         <div class="desc">Limpa todas as marcações de "visto"</div>
       </div>
@@ -357,6 +364,36 @@
   const TOTAL_EPISODES = 131;
   const PER_SEASON = 25;
   const SEASON_COUNT = Math.ceil(TOTAL_EPISODES / PER_SEASON);
+
+  // PWA install
+  let deferredPrompt = null;
+  const installBtn = document.getElementById('installBtn');
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    installBtn.style.display = 'inline-flex';
+  });
+  installBtn.addEventListener('click', async () => {
+    if (!deferredPrompt) return;
+    installBtn.style.display = 'none';
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') toast('Instalado com sucesso!');
+    else toast('Instalação cancelada');
+    deferredPrompt = null;
+  });
+  window.addEventListener('appinstalled', () => {
+    installBtn.style.display = 'none';
+    deferredPrompt = null;
+    toast('Primal Force instalado!');
+  });
+
+  // Service Worker
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js').catch(() => {});
+    });
+  }
 
   // Vídeos de teste da Blender Foundation (download.blender.org) — verificados: HTTP 200, video/mp4
   const SINTEL_480 = 'https://download.blender.org/durian/trailer/sintel_trailer-480p.mp4';
