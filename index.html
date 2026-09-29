@@ -25,6 +25,28 @@
     if (t === 'dark' || t === 'light') document.documentElement.setAttribute('data-theme', t);
   } catch (e) {}
 </script>
+<script>
+  // If the bundle never boots, Render is serving the repository root instead of dist/.
+  // Show the fix instead of a blank page.
+  window.addEventListener('load', function () {
+    setTimeout(function () {
+      if (window.__PF_READY) return;
+      var d = document.createElement('div');
+      d.setAttribute('role', 'alert');
+      d.style.cssText = 'position:fixed;inset:0;z-index:9999;background:#0b0c10;color:#f2f1ea;' +
+        'font:16px/1.6 system-ui,sans-serif;display:flex;align-items:center;justify-content:center;padding:2rem';
+      d.innerHTML = '<div style="max-width:34rem"><h1 style="font-size:1.4rem;margin:0 0 1rem">' +
+        'Build nao executado</h1><p style="color:#9497a8;margin:0 0 1rem">O site esta a ser servido sem ' +
+        'build, por isso o bundle <code>/src/main.ts</code> nao compilou.</p>' +
+        '<p style="margin:0">No Render, em <strong>Settings</strong> deste servico, define:</p>' +
+        '<ul style="color:#cfd1de;margin:.5rem 0 0 1.2rem;padding:0">' +
+        '<li><strong>Build Command</strong>: <code>npm ci &amp;&amp; npm run build</code></li>' +
+        '<li><strong>Publish Path</strong>: <code>./dist</code></li></ul>' +
+        '<p style="color:#9497a8;margin:1rem 0 0">Depois usa <em>Manual Deploy</em>.</p></div>';
+      document.body.appendChild(d);
+    }, 2500);
+  });
+</script>
 </head>
 <body>
 <a class="skip-link" href="#main">Saltar para o conteudo</a>

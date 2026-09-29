@@ -84,22 +84,28 @@ desativadas sob `prefers-reduced-motion: reduce`.
 
 Render Static Site: `render.yaml` define `npm ci && npm run build` e publica `./dist/`.
 
-### Importante: o `render.yaml` nao atualiza servicos existentes
+### Obrigatorio: configurar o servico no dashboard
 
-O Render so le `render.yaml` ao **criar** um servico novo. Se o servico ja existe, o
-ficheiro e ignorado e o build salta com `Empty build command; skipping build`, servindo
-a raiz do repositorio. Como a raiz contem `index.html` a apontar para `/src/main.ts`
-(TypeScript), o site fica em branco.
+O Render so le `render.yaml` ao **criar** um servico novo. Num servico ja existente o ficheiro e
+ignorado, o build salta com `Empty build command; skipping build` e o Render serve a raiz do
+repositorio. Como a raiz contem o `index.html` de entrada do Vite, que aponta para
+`/src/main.ts` (TypeScript), o site fica em branco.
 
-Para servicos ja criados, define a configuracao manualmente em **Settings** do servico:
+**Configura no dashboard do Render** (Settings do servico `streaming-app`):
 
 | Campo | Valor |
 | --- | --- |
 | Build Command | `npm ci && npm run build` |
 | Publish Path | `./dist` |
 
-Verifica no log do deploy que **nao** aparece `Empty build command`, e que o bundle
-existe em `/assets/index-<hash>.js`.
+Depois usa **Manual Deploy** e confirma que o log **nao** contem `Empty build command`.
+
+Como detetar o problema: a app define `window.__PF_READY` quando o bundle arranca. Se o site
+estiver a ser servido sem build, aparece um aviso vermelho com estas instrucoes em vez de uma
+pagina em branco.
+
+Verifica no log que o bundle existe em `/assets/index-<hash>.js` e que
+`https://<teu-servico>/manifest.json` e `/icons/icon-192.png` devolvem `200`.
 
 O GitHub Actions em `.github/workflows/ci.yml` corre typecheck, testes, build, medicao de
 tamanho e e2e em cada push para `main`.

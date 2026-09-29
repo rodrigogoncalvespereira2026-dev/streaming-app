@@ -521,6 +521,10 @@ renderEpisodes();
 renderContinue();
 renderTrailers();
 
+// Tells the no-build guard in index.html that the bundle booted, so the
+// "Render is serving the repo root" overlay never shows on a working deploy.
+(window as unknown as { __PF_READY: boolean }).__PF_READY = true;
+
 onOfflineEvent((detail) => {
   if (detail.status === 'done') toast.show('Download offline concluido');
 });
