@@ -55,7 +55,7 @@
 <header class="appbar">
   <div class="titles">
     <h1>Primal Force</h1>
-    <p class="sub" id="appSub">131 episodios - 6 trailers</p>
+    <p class="sub" id="appSub">131 episódios - 6 trailers</p>
   </div>
   <button type="button" class="icon-btn" id="themeBtn" aria-label="Alternar tema" title="Alternar tema">
     <span aria-hidden="true" id="themeIcon">&#9788;</span>
@@ -66,8 +66,12 @@
 </header>
 
 <nav class="tabs" role="tablist" aria-label="Seccao principal">
-  <button type="button" class="tab active" role="tab" id="tabEp" aria-controls="epPanel" aria-selected="true" data-panel="epPanel">Episodios</button>
+  <button type="button" class="tab active" role="tab" id="tabEp" aria-controls="epPanel" aria-selected="true" data-panel="epPanel">Episódios</button>
   <button type="button" class="tab" role="tab" id="tabTr" aria-controls="trPanel" aria-selected="false" tabindex="-1" data-panel="trPanel">Trailers</button>
+  <button type="button" class="tab" role="tab" id="tabRg" aria-controls="rgPanel" aria-selected="false" tabindex="-1" data-panel="rgPanel">Rangers</button>
+  <button type="button" class="tab" role="tab" id="tabVl" aria-controls="vlPanel" aria-selected="false" tabindex="-1" data-panel="vlPanel">Vilões</button>
+  <button type="button" class="tab" role="tab" id="tabGl" aria-controls="glPanel" aria-selected="false" tabindex="-1" data-panel="glPanel">Glossário</button>
+  <button type="button" class="tab" role="tab" id="tabTl" aria-controls="tlPanel" aria-selected="false" tabindex="-1" data-panel="tlPanel">Linha do Tempo</button>
 </nav>
 
 <main id="main">
@@ -109,6 +113,42 @@
     <div class="empty" id="emptyTrailers" hidden>
       <strong>Sem trailers</strong>
     </div>
+  </section>
+
+  <section class="panel" id="rgPanel" role="tabpanel" aria-labelledby="tabRg" tabindex="0" hidden>
+    <h2 class="section-title" id="rgTitle">Rangers</h2>
+    <p class="panel-note" id="rgNote"></p>
+    <div class="master-grid" id="masterList"></div>
+  </section>
+
+  <section class="panel" id="vlPanel" role="tabpanel" aria-labelledby="tabVl" tabindex="0" hidden>
+    <h2 class="section-title" id="vlTitle">Vilões</h2>
+    <p class="panel-note" id="vlNote"></p>
+    <div class="villain-list" id="villainList"></div>
+  </section>
+
+  <section class="panel" id="glPanel" role="tabpanel" aria-labelledby="tabGl" tabindex="0" hidden>
+    <h2 class="section-title" id="glTitle">Glossário</h2>
+    <div class="toolbar">
+      <div class="search-row">
+        <label class="sr-only" for="glossaryInput">Pesquisar no glossario</label>
+        <input type="search" id="glossaryInput" placeholder="Pesquisar no glossário..." autocomplete="off">
+      </div>
+      <nav class="az-index" id="glossaryIndex" aria-label="Indice do glossario"></nav>
+    </div>
+    <div class="glossary-list" id="glossaryList"></div>
+    <p class="result-count" id="glossaryCount" role="status" aria-live="polite"></p>
+  </section>
+
+  <section class="panel" id="tlPanel" role="tabpanel" aria-labelledby="tabTl" tabindex="0" hidden>
+    <h2 class="section-title" id="tlTitle">Linha do Tempo</h2>
+    <div class="toolbar">
+      <div class="filter-row">
+        <label class="sr-only" for="arcSelect">Filtrar por arco</label>
+        <select id="arcSelect"></select>
+      </div>
+    </div>
+    <ol class="timeline" id="timelineList"></ol>
   </section>
 </main>
 

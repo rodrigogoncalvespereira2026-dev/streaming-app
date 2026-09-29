@@ -731,3 +731,279 @@ main { max-width: var(--shell-max); margin: 0 auto; padding: var(--sp-4) var(--s
   flex: 0 0 auto;
   margin-right: var(--sp-1);
 }
+
+/* ============ Universo: capacete em CSS puro ============ */
+/* O capacete e desenhado apenas com divs e gradientes, na cor do Ranger.
+   Sem imagens, sem SVG, sem canvas. */
+
+.helmet {
+  --c: #e63946;
+  position: relative;
+  width: 56px;
+  height: 52px;
+  flex: 0 0 auto;
+  border-radius: 46% 46% 38% 38% / 52% 52% 40% 40%;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0) 42%),
+    linear-gradient(160deg, color-mix(in srgb, var(--c) 82%, #fff) 0%, var(--c) 45%, color-mix(in srgb, var(--c) 70%, #000) 100%);
+  box-shadow: inset 0 -6px 12px rgba(0, 0, 0, 0.45), var(--el-1);
+}
+/* Viseira: ::after, como pedido. */
+.helmet::after {
+  content: "";
+  position: absolute;
+  left: 14%;
+  right: 14%;
+  top: 30%;
+  height: 26%;
+  border-radius: 40% 40% 46% 46% / 46% 46% 40% 40%;
+  background: linear-gradient(180deg, #2b3240 0%, #0b0c10 60%, #16181f 100%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.22);
+}
+/* Detalhe do queixo, via ::before. */
+.helmet::before {
+  content: "";
+  position: absolute;
+  left: 30%;
+  right: 30%;
+  bottom: -4px;
+  height: 10px;
+  border-radius: 0 0 40% 40%;
+  background: color-mix(in srgb, var(--c) 60%, #000);
+  opacity: 0.85;
+}
+.helmet[data-size="lg"] {
+  width: 96px;
+  height: 88px;
+}
+.helmet[data-size="lg"]::after {
+  left: 13%;
+  right: 13%;
+  top: 30%;
+  height: 28%;
+}
+
+.master-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--sp-3);
+  padding: 0 var(--sp-4) var(--sp-5);
+}
+.master {
+  display: flex;
+  gap: var(--sp-3);
+  align-items: flex-start;
+  padding: var(--sp-3);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+}
+.master-head {
+  display: flex;
+  gap: var(--sp-3);
+  align-items: center;
+  width: 100%;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.master-name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--fs-md);
+  color: var(--text);
+}
+.master-alias {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--fs-xs);
+}
+.master-body {
+  margin-top: var(--sp-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  font-size: var(--fs-sm);
+}
+.master-body dt {
+  color: var(--muted);
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.master-body dd {
+  margin: 0 0 var(--sp-1);
+  color: var(--text);
+}
+
+/* ============ Vilões ============ */
+.threat-bar {
+  display: flex;
+  gap: 3px;
+  margin: var(--sp-1) 0;
+}
+.threat-seg {
+  width: 18px;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--border);
+}
+.threat-seg.on {
+  background: var(--accent);
+}
+.villain {
+  padding: var(--sp-3);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  margin: 0 var(--sp-4) var(--sp-3);
+}
+.villain h3 {
+  margin: 0;
+  font-size: var(--fs-md);
+}
+.villain .title {
+  margin: 0 0 var(--sp-2);
+  color: var(--muted);
+  font-size: var(--fs-xs);
+}
+.ep-link {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--link, #7cc0ff);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* ============ Glossario ============ */
+.az-index {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-1);
+}
+.az-index button {
+  min-width: 32px;
+  min-height: 32px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-xs);
+  background: var(--panel-2);
+  color: var(--text);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+}
+.glossary-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  padding: 0 var(--sp-4);
+}
+.glossary-item {
+  padding: var(--sp-3);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  scroll-margin-top: calc(96px + env(safe-area-inset-top, 0px));
+}
+.glossary-item h3 {
+  margin: 0 0 var(--sp-1);
+  font-size: var(--fs-md);
+}
+.glossary-item .cat {
+  display: inline-block;
+  margin-left: var(--sp-2);
+  padding: 2px 8px;
+  border-radius: var(--r-pill);
+  background: var(--panel-2);
+  color: var(--muted);
+  font-size: var(--fs-xs);
+}
+
+/* ============ Linha do tempo ============ */
+.timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0 var(--sp-4) var(--sp-5) calc(var(--sp-6) + var(--sp-4));
+  border-left: 2px solid var(--border);
+}
+.timeline li {
+  position: relative;
+  padding: 0 0 var(--sp-4) 0;
+}
+.timeline li::before {
+  content: "";
+  position: absolute;
+  left: calc(-1 * (var(--sp-6) + var(--sp-4)) - 5px);
+  top: 6px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--arc-color, var(--accent));
+}
+.timeline .arc-range {
+  color: var(--muted);
+  font-size: var(--fs-xs);
+}
+.timeline h3 {
+  margin: 0 0 var(--sp-1);
+  font-size: var(--fs-md);
+}
+.timeline p {
+  margin: 0 0 var(--sp-2);
+  color: var(--text);
+  font-size: var(--fs-sm);
+}
+.timeline .key-eps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-1);
+}
+.timeline .key-eps button {
+  min-height: 32px;
+  padding: 0 var(--sp-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  background: var(--panel-2);
+  color: var(--text);
+  cursor: pointer;
+  font: inherit;
+  font-size: var(--fs-xs);
+}
+.panel-note,
+.section-title {
+  padding: 0 var(--sp-4);
+}
+.panel-note {
+  margin: 0 0 var(--sp-3);
+  color: var(--muted);
+  font-size: var(--fs-xs);
+}
+.arc-flag {
+  display: inline-block;
+  margin-left: var(--sp-2);
+  padding: 1px 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-xs);
+  color: var(--muted);
+  font-size: 0.7rem;
+  vertical-align: middle;
+}
+
+/* Six tabs overflow narrow viewports: allow horizontal scrolling instead of
+   truncating labels. */
+.tabs {
+  overflow-x: auto;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+.tabs .tab {
+  flex: 0 0 auto;
+  white-space: nowrap;
+  min-width: 5.5rem;
+}

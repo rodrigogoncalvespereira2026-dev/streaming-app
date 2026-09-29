@@ -25,6 +25,7 @@ import {
 } from './store';
 import { filterEpisodes } from './utils/search';
 import { downloadVideo, onOfflineEvent, registerOffline, watchConnection } from './utils/offline';
+import { UniversePanels } from './components/universePanels';
 
 const PER_SEASON = 25;
 const TOTAL = episodes.length;
@@ -44,7 +45,6 @@ const toast = new Toast($('toast'));
 const announce = (msg: string): void => {
   $('srAnnounce').textContent = msg;
 };
-
 /* ---------------- Theme ---------------- */
 
 function syncThemeIcon(): void {
@@ -471,6 +471,54 @@ function renderTrailers(autoplay = false): void {
 
 let trailerPlayer: VideoPlayer | null = null;
 
+/* ---------------- Universo: Rangers, Vilaes, Glossario, Linha do Tempo ---------------- */
+
+/**
+ * Abre um episodio a partir de outro separador: muda para Episodios, salta para
+ * a temporada certa, abre o acordeao e faz scroll ate ele.
+ */
+function gotoEpisode(num: number): void {
+  const ep = episodes.find((e) => e.num === num);
+  if (!ep) {
+    toast.show('Episodio ' + num + ' nao existe no catalogo');
+    return;
+  }
+  const targetSeason = Math.ceil(num / PER_SEASON);
+  if (Number(seasonSelect.value) !== targetSeason) {
+    seasonSelect.value = String(targetSeason);
+    season.set(targetSeason);
+  }
+  statusFilter.set('all');
+  query.set('');
+  searchInput.value = '';
+  document.querySelectorAll<HTMLElement>('.chip').forEach((c) => {
+    const on = c.dataset.status === 'all';
+    c.classList.toggle('active', on);
+    c.setAttribute('aria-pressed', String(on));
+  });
+  selectTab($('tabEp'));
+  renderEpisodes();
+  openEpisodes.add(num);
+  expand(num, true);
+  announce('Episodio ' + num + ' aberto');
+}
+
+const panels = new UniversePanels();
+
+function renderUniversePanels(): void {
+  panels.renderMasters($('masterList'), $('rgNote'));
+  panels.renderVillains($('villainList'), $('vlNote'));
+  panels.renderGlossary(
+    $('glossaryList'),
+    $('glossaryIndex'),
+    $('glossaryCount'),
+    $<HTMLInputElement>('glossaryInput'),
+  );
+  panels.renderTimeline($('timelineList'), $<HTMLSelectElement>('arcSelect'));
+  UniversePanels.wire($('villainList'), gotoEpisode);
+  UniversePanels.wire($('timelineList'), gotoEpisode);
+}
+
 $('trailerList').addEventListener('click', (e) => {
   const btn = (e.target as HTMLElement).closest<HTMLElement>('.trailer-card');
   if (!btn) return;
@@ -520,6 +568,7 @@ watched.subscribe(() => renderEpisodes());
 renderEpisodes();
 renderContinue();
 renderTrailers();
+renderUniversePanels();
 
 // Tells the no-build guard in index.html that the bundle booted, so the
 // "Render is serving the repo root" overlay never shows on a working deploy.
