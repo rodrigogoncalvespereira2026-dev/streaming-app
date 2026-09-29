@@ -82,6 +82,24 @@ desativadas sob `prefers-reduced-motion: reduce`.
 
 ## Deploy
 
-Render Static Site: `render.yaml` constroi com `npm ci && npm run build` e publica `dist/`.
+Render Static Site: `render.yaml` define `npm ci && npm run build` e publica `./dist/`.
+
+### Importante: o `render.yaml` nao atualiza servicos existentes
+
+O Render so le `render.yaml` ao **criar** um servico novo. Se o servico ja existe, o
+ficheiro e ignorado e o build salta com `Empty build command; skipping build`, servindo
+a raiz do repositorio. Como a raiz contem `index.html` a apontar para `/src/main.ts`
+(TypeScript), o site fica em branco.
+
+Para servicos ja criados, define a configuracao manualmente em **Settings** do servico:
+
+| Campo | Valor |
+| --- | --- |
+| Build Command | `npm ci && npm run build` |
+| Publish Path | `./dist` |
+
+Verifica no log do deploy que **nao** aparece `Empty build command`, e que o bundle
+existe em `/assets/index-<hash>.js`.
+
 O GitHub Actions em `.github/workflows/ci.yml` corre typecheck, testes, build, medicao de
 tamanho e e2e em cada push para `main`.
