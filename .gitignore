@@ -1,0 +1,12 @@
+node_modules/
+dist/
+test-results/
+playwright-report/
+blob-report/
+.playwright/
+
+# Local scratch output from ad-hoc verification runs
+*.txt
+pid.txt
+dlpid.txt
+svrpid.txt
