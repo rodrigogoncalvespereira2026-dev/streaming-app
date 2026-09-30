@@ -87,8 +87,51 @@ test('shows a player with custom controls on the trailers tab', async ({ page })
   await expect(page.locator('#trailerMain [role="slider"]').first()).toBeVisible();
 });
 
-test('serves a valid manifest with icons', async ({ request }) => {
-  const res = await request.get('/manifest.json');
+test('hides the centre play button while the video plays and the controls autohide', async ({ page }) => {
+  // Force the desktop hover path. On a touch profile the `@media (pointer: coarse)`
+  // rule hides the button with `display: none`, which would mask the cascade bug
+  // this test is about.
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.addStyleTag({
+    content: '@media (pointer: coarse){ .player.is-playing .big-play { display: revert !important; } }',
+  });
+  await page.getByRole('tab', { name: 'Trailers' }).click();
+  const shell = page.locator('#trailerMain .player');
+  const bigPlay = page.locator('#trailerMain .big-play');
+
+  // `opacity: 0` still counts as visible to the locator, so read the computed
+  // style. This is the exact value that was wrong before the fix.
+  const opacity = () => bigPlay.evaluate((n) => getComputedStyle(n).opacity);
+
+  // Paused: the centre button is the call to action.
+  await expect(bigPlay).toBeVisible();
+  expect(await opacity()).toBe('1');
+
+  // Playing: the centre button must fade out.
+  await shell.evaluate((node) => {
+    (node.querySelector('video') as HTMLVideoElement).play().catch(() => {});
+  });
+  await expect(shell).toHaveClass(/is-playing/);
+  await expect.poll(opacity).toBe('0');
+
+  // The regression: while the video plays and the pointer sits still, the
+  // autohide timer adds `is-idle` on top of `is-playing`. Both rules matched the
+  // centre button with equal specificity, and `is-idle` came last, so the button
+  // came back on top of the running video.
+  await shell.evaluate((node) => node.classList.add('is-idle'));
+  await expect(shell).toHaveClass(/is-playing/);
+  await expect(shell).toHaveClass(/is-idle/);
+  await expect.poll(opacity).toBe('0');
+
+  // Paused again: the button returns.
+  await shell.evaluate((node) => {
+    (node.querySelector('video') as HTMLVideoElement).pause();
+  });
+  await expect(shell).not.toHaveClass(/is-playing/);
+  await expect.poll(opacity).toBe('1');
+});
+
+test('serves a valid manifest with icons', async ({ request }) => {  const res = await request.get('/manifest.json');
   expect(res.ok()).toBe(true);
   const body = await res.json();
   expect(body.display).toBe('standalone');

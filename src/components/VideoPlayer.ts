@@ -263,7 +263,9 @@ export class VideoPlayer {
     ['pointermove', 'pointerdown', 'focusin'].forEach((evt) =>
       this.shell.addEventListener(evt, this.onActivity),
     );
-    v.addEventListener('pointerleave', () => this.shell.classList.remove('is-idle'));
+    // Leaving the surface must not bring the controls back; the idle timer armed
+    // by the last activity hides them on its own.
+    v.addEventListener('pointerleave', () => this.wake());
     document.addEventListener('fullscreenchange', () => this.onFullscreenChange());
 
     this.progressTimer = window.setInterval(() => this.emitProgress(), 5000);
