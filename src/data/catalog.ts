@@ -1,4 +1,4 @@
-export interface Episode { num: number; title: string; synopsis?: string; video?: string; airDate?: string; runtime?: number; rating?: string; tags?: string[]; }
+export interface Episode { num: number; title: string; synopsis?: string; video?: string; airDate?: string; runtime?: number; rating?: number; tags?: string[]; }
 export const SINTEL_480 = 'https://download.blender.org/durian/trailer/sintel_trailer-480p.mp4';
 export const SINTEL_720 = 'https://download.blender.org/durian/trailer/sintel_trailer-720p.mp4';
 export const SINTEL_1080 = 'https://download.blender.org/durian/trailer/sintel_trailer-1080p.mp4';
