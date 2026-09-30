@@ -8,7 +8,6 @@ import { Toast } from './components/Toast';
 import { VideoPlayer } from './components/VideoPlayer';
 import {
   applyTheme,
-  continueWatching,
   favorites,
   isFavorite,
   isWatched,
@@ -26,6 +25,8 @@ import {
 import { filterEpisodes } from './utils/search';
 import { downloadVideo, onOfflineEvent, registerOffline, watchConnection } from './utils/offline';
 import { UniversePanels } from './components/universePanels';
+import { STRINGS, fill } from './data/universe';
+import { nextToWatch, overallProgress, seasonProgress } from './store';
 
 const PER_SEASON = 25;
 const TOTAL = episodes.length;
@@ -160,7 +161,6 @@ function ensurePlayer(host: HTMLElement, num: number): VideoPlayer {
     onProgress: (id, seconds, duration) => {
       const n = Number(id);
       if (Number.isFinite(n)) recordProgress(n, seconds, duration);
-      renderContinue();
     },
     onEnded: (id) => {
       const n = Number(id);
@@ -377,35 +377,100 @@ async function shareEpisode(ep: Episode): Promise<void> {
 
 /* ---------------- Continue watching ---------------- */
 
+const P = STRINGS.progress;
+
+/**
+ * Barra global, contador do selector de temporada e badge nos separadores.
+ * Chamada por `subscribe`, nunca por polling.
+ */
+function renderProgressUI(): void {
+  const overall = overallProgress(TOTAL);
+
+  const bar = $('overallBar');
+  bar.setAttribute('aria-valuenow', String(overall.percent));
+  bar.setAttribute('aria-label', P.overallLabel);
+  $('overallFill').style.width = overall.percent + '%';
+  $('overallText').textContent = fill(P.seenOfTotal, {
+    seen: overall.seen,
+    total: overall.total,
+    percent: overall.percent,
+  });
+
+  const sp = seasonProgress(Number(seasonSelect.value), PER_SEASON, TOTAL);
+  const opt = seasonSelect.options[seasonSelect.selectedIndex];
+  if (opt) {
+    opt.textContent = fill(P.seasonOption, {
+      season: sp.season,
+      seen: sp.seen,
+      total: sp.total,
+    });
+  }
+
+  const badge = $('tabEpBadge');
+  if (badge) badge.textContent = fill(P.tabBadge, { seen: sp.seen, total: sp.total });
+}
+
 function renderContinue(): void {
-  const row = $('continueRow');
-  const nums = continueWatching();
-  if (nums.length === 0) {
-    row.hidden = true;
+  const section = $('continueSection');
+  const list = $('continueList');
+  const next = nextToWatch(
+    Number(seasonSelect.value),
+    PER_SEASON,
+    TOTAL,
+    isWatched,
+    (n) => {
+      const p = progressFor(n);
+      return !!p && p.seconds >= 5 && p.seconds / p.duration < 0.95;
+    },
+  );
+
+  // Nothing left in this season: show a completion state, not an empty row.
+  if (next === null) {
+    list.hidden = true;
+    const done = $('continueDone');
+    done.textContent = P.allDone + '. ' + P.allDoneBody;
+    done.hidden = false;
+    section.hidden = false;
     return;
   }
-  row.hidden = false;
-  $('continueList').innerHTML = nums
-    .map((n) => {
-      const ep = episodes.find((x) => x.num === n);
-      const pr = progressFor(n);
-      const pct = pr ? Math.round((pr.seconds / pr.duration) * 100) : 0;
-      return (
-        '<button type="button" class="continue-card" data-num="' +
-        esc(n) +
-        '">' +
-        '<span class="t">' +
-        esc('Epis\u00f3dio ' + n + (ep ? ': ' + ep.title : '')) +
-        '</span>' +
-        '<span class="progress" role="progressbar" aria-label="Progresso" aria-valuenow="' +
+
+  $('continueDone').hidden = true;
+  list.hidden = false;
+
+  const ep = episodes.find((x) => x.num === next);
+  const pr = progressFor(next);
+  const hasPartial = !!pr && pr.seconds >= 5;
+  const pct = pr && pr.duration > 0 ? Math.round((pr.seconds / pr.duration) * 100) : 0;
+  const mins = pr && pr.duration > 0 ? Math.max(1, Math.round((pr.duration - pr.seconds) / 60)) : 0;
+  const heading =
+    (hasPartial ? P.resume : P.start) +
+    ': ' +
+    STRINGS.universe.episode +
+    ' ' +
+    next +
+    (ep ? ': ' + ep.title : '');
+
+  section.hidden = false;
+  list.innerHTML =
+    '<button type="button" class="continue-card" data-num="' +
+    esc(next) +
+    '">' +
+    '<span class="t">' +
+    esc(heading) +
+    '</span>' +
+    (hasPartial
+      ? '<span class="progress" role="progressbar" aria-label="' +
+        esc(P.partialBar) +
+        '" aria-valuenow="' +
         pct +
         '" aria-valuemin="0" aria-valuemax="100" style="--progress:' +
         pct +
         '%"><span class="bar"></span></span>' +
-        '</button>'
-      );
-    })
-    .join('');
+        '<span class="cta">' +
+        esc(fill(P.minutesLeft, { min: mins })) +
+        '</span>'
+      : '<span class="cta">' + esc(P.nextUp) + '</span>') +
+    '</button>';
 }
 
 $('continueList').addEventListener('click', (e) => {
@@ -565,7 +630,19 @@ statusFilter.subscribe(() => renderEpisodes());
 favorites.subscribe(() => renderEpisodes());
 watched.subscribe(() => renderEpisodes());
 
+// Progress UI reacts to the existing signals; no polling anywhere.
+watched.subscribe(() => {
+  renderProgressUI();
+  renderContinue();
+});
+progress.subscribe(() => {
+  renderProgressUI();
+  renderContinue();
+});
+season.subscribe(() => renderProgressUI());
+
 renderEpisodes();
+renderProgressUI();
 renderContinue();
 renderTrailers();
 renderUniversePanels();

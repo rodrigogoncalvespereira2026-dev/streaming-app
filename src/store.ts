@@ -112,6 +112,67 @@ export function progressFor(num: number): ProgressEntry | undefined {
   return progress.get()[num];
 }
 
+export interface SeasonProgress {
+  season: number;
+  total: number;
+  seen: number;
+  percent: number;
+}
+
+/** Episodes belonging to a season, derived from a fixed per-season size. */
+export function seasonRange(s: number, perSeason: number, total: number): [number, number] {
+  const start = (s - 1) * perSeason + 1;
+  return [start, Math.min(s * perSeason, total)];
+}
+
+/** Watched count and percentage for one season. Percent is rounded down. */
+export function seasonProgress(
+  s: number,
+  perSeason: number,
+  total: number,
+  seen: (n: number) => boolean = isWatched,
+): SeasonProgress {
+  const [start, end] = seasonRange(s, perSeason, total);
+  let count = 0;
+  for (let n = start; n <= end; n += 1) if (seen(n)) count += 1;
+  const size = end - start + 1;
+  return { season: s, total: size, seen: count, percent: size === 0 ? 0 : Math.floor((count / size) * 100) };
+}
+
+/** Overall watched count and percentage across every episode. */
+export function overallProgress(
+  total: number,
+  seen: (n: number) => boolean = isWatched,
+): { seen: number; total: number; percent: number } {
+  let count = 0;
+  for (let n = 1; n <= total; n += 1) if (seen(n)) count += 1;
+  return { seen: count, total, percent: total === 0 ? 0 : Math.floor((count / total) * 100) };
+}
+
+/**
+ * The next episode to watch, preferring one already in progress and falling
+ * back to the first unwatched episode of the active season. Returns null when
+ * everything is watched.
+ */
+export function nextToWatch(
+  seasonNum: number,
+  perSeason: number,
+  total: number,
+  seen: (n: number) => boolean = isWatched,
+  partial?: (n: number) => boolean,
+): number | null {
+  const [start, end] = seasonRange(seasonNum, perSeason, total);
+  if (partial) {
+    for (let n = start; n <= end; n += 1) {
+      if (!seen(n) && partial(n)) return n;
+    }
+  }
+  for (let n = start; n <= end; n += 1) {
+    if (!seen(n)) return n;
+  }
+  return null;
+}
+
 /** Up to `count` episodes with real partial progress, most recently played first. */
 export function continueWatching(count = 3): number[] {
   const entries = Object.entries(progress.get()) as [string, ProgressEntry][];

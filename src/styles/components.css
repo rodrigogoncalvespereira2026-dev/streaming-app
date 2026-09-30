@@ -1007,3 +1007,112 @@ main { max-width: var(--shell-max); margin: 0 auto; padding: var(--sp-4) var(--s
   white-space: nowrap;
   min-width: 5.5rem;
 }
+
+/* ============ Progresso global ============ */
+.overall-progress {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: 0 var(--sp-4) var(--sp-3);
+}
+.overall-bar {
+  flex: 1 1 auto;
+  height: 8px;
+  border-radius: var(--r-pill);
+  background: var(--panel-2);
+  overflow: hidden;
+}
+.overall-fill {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--accent) 0%, var(--accent-2, #f2b93a) 100%);
+  /* Animated fill; disabled under prefers-reduced-motion below. */
+  transition: width var(--dur-slow) var(--ease-out-quart);
+}
+.overall-text {
+  margin: 0;
+  flex: 0 0 auto;
+  color: var(--muted);
+  font-size: var(--fs-xs);
+  font-variant-numeric: tabular-nums;
+}
+@media (prefers-reduced-motion: reduce) {
+  .overall-fill {
+    transition: none;
+  }
+}
+
+/* Contador nos separadores */
+.tab {
+  position: relative;
+}
+.tab-badge {
+  display: inline-block;
+  margin-left: 0.3rem;
+  padding: 0 5px;
+  border-radius: var(--r-pill);
+  background: color-mix(in srgb, currentColor 18%, transparent);
+  font-size: 0.68rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  vertical-align: middle;
+}
+
+/* Estado de conclusao em "Continuar a ver" */
+.continue-done {
+  padding: var(--sp-3);
+  margin: 0 var(--sp-4) var(--sp-3);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  color: var(--muted);
+  font-size: var(--fs-sm);
+}
+.continue-card .cta {
+  display: block;
+  margin-top: var(--sp-2);
+  color: var(--muted);
+  font-size: var(--fs-xs);
+}
+
+/* The continue row is a horizontal scroller: the heading must span the full
+   width instead of becoming a grid column. */
+.continue-row > .section-title {
+  grid-column: 1 / -1;
+  margin: 0 0 var(--sp-1);
+  padding: 0;
+  font-size: var(--fs-md);
+}
+.continue-done {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+/* Episode title and meta are separate spans, so they need to stack. */
+.ep-info .name,
+.ep-info .sub {
+  display: block;
+}
+
+/* "Continuar a ver": a secao e um bloco normal e so os cartoes sao um
+   scroller horizontal. O cabecalho nao e participating na grelha. */
+.continue-row {
+  display: block;
+  margin-bottom: var(--sp-4);
+}
+.continue-row .section-title {
+  margin: 0 0 var(--sp-2);
+  padding: 0 var(--sp-4);
+  font-size: var(--fs-md);
+}
+.continue-done {
+  margin: 0 var(--sp-4) var(--sp-2);
+  padding: var(--sp-3);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  color: var(--muted);
+  font-size: var(--fs-sm);
+}

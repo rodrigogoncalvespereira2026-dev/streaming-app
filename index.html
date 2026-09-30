@@ -66,13 +66,20 @@
 </header>
 
 <nav class="tabs" role="tablist" aria-label="Seccao principal">
-  <button type="button" class="tab active" role="tab" id="tabEp" aria-controls="epPanel" aria-selected="true" data-panel="epPanel">Episódios</button>
+  <button type="button" class="tab active" role="tab" id="tabEp" aria-controls="epPanel" aria-selected="true" data-panel="epPanel">Episódios<span class="tab-badge" id="tabEpBadge">0/25</span></button>
   <button type="button" class="tab" role="tab" id="tabTr" aria-controls="trPanel" aria-selected="false" tabindex="-1" data-panel="trPanel">Trailers</button>
   <button type="button" class="tab" role="tab" id="tabRg" aria-controls="rgPanel" aria-selected="false" tabindex="-1" data-panel="rgPanel">Rangers</button>
   <button type="button" class="tab" role="tab" id="tabVl" aria-controls="vlPanel" aria-selected="false" tabindex="-1" data-panel="vlPanel">Vilões</button>
   <button type="button" class="tab" role="tab" id="tabGl" aria-controls="glPanel" aria-selected="false" tabindex="-1" data-panel="glPanel">Glossário</button>
   <button type="button" class="tab" role="tab" id="tabTl" aria-controls="tlPanel" aria-selected="false" tabindex="-1" data-panel="tlPanel">Linha do Tempo</button>
 </nav>
+
+<div class="overall-progress" id="overallProgress">
+  <div class="overall-bar" role="progressbar" id="overallBar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Progresso total">
+    <span class="overall-fill" id="overallFill"></span>
+  </div>
+  <p class="overall-text" id="overallText">0 de 131 vistos (0%)</p>
+</div>
 
 <main id="main">
   <section class="panel active" id="epPanel" role="tabpanel" aria-labelledby="tabEp" tabindex="0">
@@ -94,8 +101,10 @@
       <p class="result-count" id="resultCount" role="status" aria-live="polite"></p>
     </div>
 
-    <section class="continue-row" id="continueRow" aria-labelledby="continueTitle" hidden>
+    <section class="continue-row" aria-labelledby="continueTitle" hidden id="continueSection">
       <h2 class="section-title" id="continueTitle">Continuar a ver</h2>
+      <p class="continue-done" id="continueDone" hidden></p>
+      <!-- Only the cards scroll; the heading and completion state stay put. -->
       <div class="continue-list" id="continueList"></div>
     </section>
 

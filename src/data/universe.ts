@@ -11,6 +11,16 @@
 
 export type ThreatLevel = 1 | 2 | 3 | 4 | 5;
 
+/**
+ * Preenche tokens `{placeholder}` de uma entrada de STRINGS.
+ * Explicit e pequeno, sem engine de templates.
+ */
+export function fill(template: string, values: Record<string, string | number>): string {
+  return template.replace(/\{(\w+)\}/g, (whole, key: string) =>
+    key in values ? String(values[key]) : whole,
+  );
+}
+
 export interface Master {
   id: string;
   name: string;
@@ -90,6 +100,20 @@ export const STRINGS = {
     noResults: 'Sem resultados',
     index: 'Índice',
     threatEstimate: 'Nível de ameaça (avaliação própria, não oficial)',
+  },
+  progress: {
+    overallLabel: 'Progresso total',
+    seenOfTotal: '{seen} de {total} vistos ({percent}%)',
+    seasonOption: 'Temp. {season} · {seen}/{total} vistos',
+    tabBadge: '{seen}/{total}',
+    continueTitle: 'Continuar a ver',
+    nextUp: 'A seguir',
+    resume: 'Retomar',
+    start: 'Começar',
+    allDone: 'Viste tudo',
+    allDoneBody: 'Todos os episódios estão marcados como vistos.',
+    partialBar: 'Progresso do episódio',
+    minutesLeft: 'Faltam {min} min',
   },
 } as const;
 
